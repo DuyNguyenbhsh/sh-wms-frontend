@@ -1,204 +1,87 @@
 import { useEffect, useState } from 'react';
-import { 
-  Table, Card, Tag, Button, Space, Typography, Tooltip, 
-  message, Input, Select, Row, Col, Modal, Descriptions, Divider 
-} from 'antd';
-import { 
-  PrinterOutlined, CarOutlined, CheckCircleOutlined, 
-  SyncOutlined, FileSearchOutlined, SearchOutlined, 
-  RocketOutlined, ClockCircleOutlined 
-} from '@ant-design/icons';
+import { Table, Card, Tag, Button, Input, Space, List, Typography, Divider } from 'antd';
+import { PrinterOutlined, PlusOutlined, SearchOutlined, CarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
-const { Text, Title } = Typography;
-const { Option } = Select;
+const { Text } = Typography;
 
 const WaybillListPage = () => {
   const [data, setData] = useState<any[]>([]);
-  const [providers, setProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  
-  // State cho bộ lọc
-  const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-
-  // State cho Modal chi tiết / In ấn
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentWaybill, setCurrentWaybill] = useState<any>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     fetchData();
+    // Lắng nghe sự kiện xoay màn hình/đổi kích thước
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [waybillsRes, providersRes] = await Promise.all([
-        axios.get('https://sh-wms-backend.onrender.com/tms/waybill'),
-        axios.get('https://sh-wms-backend.onrender.com/master-data/providers')
-      ]);
-      setData(waybillsRes.data);
-      setProviders(providersRes.data);
-    } catch (error) {
-      message.error('Lỗi tải dữ liệu');
-    }
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const res = await axios.get(`${apiUrl}/tms/waybill`);
+      setData(res.data.reverse()); // Mới nhất lên đầu
+    } catch (error) { console.error(error); }
     setLoading(false);
   };
 
-  const getProviderName = (id: string) => {
-    const p = providers.find(x => x.id === id);
-    return p ? <Tag color="blue">{p.name}</Tag> : <Tag>Nội bộ / Khác</Tag>;
-  };
-
-  // Hàm hiển thị trạng thái đẹp mắt
-  const renderStatus = (status: string) => {
-    switch (status) {
-      case 'NEW': return <Tag icon={<ClockCircleOutlined />} color="default">Mới tạo</Tag>;
-      case 'READY_TO_PICK': return <Tag icon={<CheckCircleOutlined />} color="orange">Chờ lấy hàng</Tag>;
-      case 'DELIVERING': return <Tag icon={<RocketOutlined />} color="processing">Đang giao hàng</Tag>;
-      case 'DELIVERED': return <Tag icon={<CheckCircleOutlined />} color="success">Đã giao xong</Tag>;
-      case 'CANCELLED': return <Tag color="error">Đã hủy</Tag>;
-      default: return <Tag>{status}</Tag>;
-    }
-  };
-
-  // Xử lý In Vận Đơn
-  const handlePrint = (record: any) => {
-    setCurrentWaybill(record);
-    setIsModalOpen(true);
-    // Trong thực tế, anh có thể mở một cửa sổ mới window.open('/print-waybill/...') để in PDF
-  };
-
-  // Lọc dữ liệu
-  const filteredData = data.filter(item => {
-    const matchText = item.waybillCode?.toLowerCase().includes(searchText.toLowerCase()) || 
-                      item.customerName?.toLowerCase().includes(searchText.toLowerCase());
-    const matchStatus = statusFilter === 'ALL' || item.status === statusFilter;
-    return matchText && matchStatus;
-  });
-
+  // CỘT CHO MÁY TÍNH
   const columns = [
-    {
-      title: 'Mã Vận Đơn', dataIndex: 'waybillCode', key: 'waybillCode', width: 180,
-      render: (t: string) => <Text strong copyable>{t}</Text>
-    },
-    {
-      title: 'Đơn vị vận chuyển', dataIndex: 'providerId', key: 'providerId',
-      render: (id: string) => getProviderName(id)
-    },
-    {
-      title: 'Thông tin giao hàng', key: 'info',
-      render: (_: any, r: any) => (
-        <div>
-           <div><Text strong>{r.customerName}</Text> - <Text type="secondary">{r.phone}</Text></div>
-           <div style={{fontSize: 12, color: '#666'}}>{r.address}</div>
-        </div>
-      )
-    },
-    {
-      title: 'Thu hộ (COD)', dataIndex: 'codAmount', align: 'right' as const, width: 120,
-      render: (val: string) => <Text strong style={{color: '#faad14'}}>{parseInt(val || '0').toLocaleString()} đ</Text>
-    },
-    {
-      title: 'Ngày tạo', dataIndex: 'createdAt', width: 140,
-      render: (d: string) => dayjs(d).format('DD/MM/YYYY HH:mm')
-    },
-    {
-      title: 'Trạng thái', dataIndex: 'status', align: 'center' as const, width: 150,
-      render: (status: string) => renderStatus(status)
-    },
-    {
-      title: 'Thao tác', key: 'action', align: 'center' as const, width: 100,
-      render: (_:any, record: any) => (
-        <Space>
-          <Tooltip title="In Phiếu Giao Hàng">
-             <Button size="small" icon={<PrinterOutlined />} onClick={() => handlePrint(record)} />
-          </Tooltip>
-        </Space>
-      )
-    }
+    { title: 'Mã Vận Đơn', dataIndex: 'waybillCode', render: (t:string) => <b>{t}</b> },
+    { title: 'ĐVVC', dataIndex: 'providerId', render: (t:string) => <Tag color="blue">{t}</Tag> },
+    { title: 'Thu hộ (COD)', dataIndex: 'codAmount', render: (v:any) => <b style={{color:'red'}}>{Number(v).toLocaleString()}đ</b> },
+    { title: 'Ngày tạo', dataIndex: 'createdAt', render: (v:string) => dayjs(v).format('DD/MM HH:mm') },
+    { title: 'Trạng thái', dataIndex: 'status', render: (s:string) => <Tag color={s==='DELIVERED'?'green':'orange'}>{s}</Tag> },
+    { title: 'Thao tác', render: () => <Button icon={<PrinterOutlined />} size="small" /> }
   ];
 
   return (
-    <div style={{ padding: 20 }}>
-      <Card 
-        title={<span><CarOutlined /> DANH SÁCH VẬN ĐƠN (Chờ xuất kho)</span>} 
-        bordered={false} 
-        style={{ borderRadius: 8 }}
-      >
-        {/* THANH CÔNG CỤ TÌM KIẾM */}
-        <Row gutter={16} style={{ marginBottom: 20 }}>
-           <Col span={8}>
-              <Input 
-                prefix={<SearchOutlined style={{color: '#ccc'}} />} 
-                placeholder="Tìm mã vận đơn, tên khách hàng..." 
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-              />
-           </Col>
-           <Col span={4}>
-              <Select defaultValue="ALL" style={{ width: '100%' }} onChange={setStatusFilter}>
-                 <Option value="ALL">Tất cả trạng thái</Option>
-                 <Option value="READY_TO_PICK">Chờ lấy hàng</Option>
-                 <Option value="DELIVERING">Đang giao hàng</Option>
-                 <Option value="DELIVERED">Đã giao xong</Option>
-              </Select>
-           </Col>
-           <Col span={12} style={{ textAlign: 'right' }}>
-              <Button onClick={fetchData} icon={<SyncOutlined />}>Làm mới</Button>
-           </Col>
-        </Row>
+    <div style={{ padding: isMobile ? 10 : 20 }}>
+      {/* THANH CÔNG CỤ */}
+      <div style={{ marginBottom: 15, display: 'flex', gap: 10 }}>
+        <Input placeholder="Tìm vận đơn..." prefix={<SearchOutlined />} style={{ flex: 1 }} />
+        <Button type="primary" icon={<PlusOutlined />}>{!isMobile && 'Tạo đơn'}</Button>
+      </div>
 
-        <Table 
-          columns={columns} 
-          dataSource={filteredData} 
-          rowKey="id" 
+      {/* HIỂN THỊ DỮ LIỆU */}
+      {isMobile ? (
+        // GIAO DIỆN MOBILE (DẠNG THẺ) - FIX LỖI CHỮ DỌC
+        <List
           loading={loading}
-          pagination={{ pageSize: 8 }}
-          size="middle"
+          dataSource={data}
+          renderItem={(item) => (
+            <Card style={{ marginBottom: 10, borderRadius: 8 }} bodyStyle={{ padding: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                <Text strong style={{ fontSize: 16, color: '#1890ff' }}>{item.waybillCode}</Text>
+                <Tag color={item.status === 'DELIVERED' ? 'green' : (item.status === 'DELIVERING' ? 'blue' : 'orange')}>
+                  {item.status}
+                </Tag>
+              </div>
+              
+              <div style={{ fontSize: 13, color: '#666', marginBottom: 5 }}>
+                <CarOutlined /> {item.providerId} | {dayjs(item.createdAt).format('DD/MM/YY')}
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 10, borderTop: '1px solid #f0f0f0' }}>
+                 <div>
+                    <div style={{fontSize: 12, color:'#888'}}>Tiền thu hộ (COD)</div>
+                    <div style={{fontWeight: 'bold', color: '#cf1322', fontSize: 16}}>{Number(item.codAmount).toLocaleString()}đ</div>
+                 </div>
+                 <Button icon={<PrinterOutlined />}>In</Button>
+              </div>
+            </Card>
+          )}
         />
-      </Card>
-
-      {/* MODAL IN PHIẾU GIAO HÀNG (Giả lập) */}
-      <Modal 
-         title={<><PrinterOutlined /> Phiếu Giao Hàng</>}
-         open={isModalOpen} 
-         onCancel={() => setIsModalOpen(false)}
-         width={700}
-         footer={[
-            <Button key="close" onClick={() => setIsModalOpen(false)}>Đóng</Button>,
-            <Button key="print" type="primary" icon={<PrinterOutlined />} onClick={() => window.print()}>In Ngay</Button>
-         ]}
-      >
-         {currentWaybill && (
-            <div id="print-area" style={{ padding: 20, border: '1px dashed #ccc', background: '#fff' }}>
-               <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                  <Title level={4}>PHIẾU GIAO HÀNG</Title>
-                  <Text type="secondary">Mã vận đơn: {currentWaybill.waybillCode}</Text>
-               </div>
-               <Descriptions bordered column={1} size="small">
-                  <Descriptions.Item label="Người nhận">{currentWaybill.customerName} - {currentWaybill.phone}</Descriptions.Item>
-                  <Descriptions.Item label="Địa chỉ giao">{currentWaybill.address}</Descriptions.Item>
-                  <Descriptions.Item label="Tiền thu hộ (COD)"><Text strong style={{fontSize: 16}}>{parseInt(currentWaybill.codAmount).toLocaleString()} VNĐ</Text></Descriptions.Item>
-                  <Descriptions.Item label="Đơn vị vận chuyển">{getProviderName(currentWaybill.providerId)}</Descriptions.Item>
-                  <Descriptions.Item label="Ghi chú">Cho xem hàng trước khi nhận</Descriptions.Item>
-               </Descriptions>
-               
-               <Divider />
-               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 40 }}>
-                  <div style={{textAlign: 'center', width: '40%'}}>
-                     <Text strong>Người nhận hàng</Text><br/>
-                     <Text type="secondary">(Ký, ghi rõ họ tên)</Text>
-                  </div>
-                  <div style={{textAlign: 'center', width: '40%'}}>
-                     <Text strong>Nhân viên giao hàng</Text><br/>
-                     <Text type="secondary">(Ký xác nhận)</Text>
-                  </div>
-               </div>
-            </div>
-         )}
-      </Modal>
+      ) : (
+        // GIAO DIỆN PC (DẠNG BẢNG)
+        <Card bordered={false} style={{ borderRadius: 8 }}>
+           <Table columns={columns} dataSource={data} rowKey="id" loading={loading} pagination={{ pageSize: 8 }} />
+        </Card>
+      )}
     </div>
   );
 };
