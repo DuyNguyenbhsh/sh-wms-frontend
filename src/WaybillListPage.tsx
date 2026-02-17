@@ -35,8 +35,8 @@ const WaybillListPage = () => {
     setLoading(true);
     try {
       const [waybillsRes, providersRes] = await Promise.all([
-        axios.get('http://localhost:3000/tms/waybill'),
-        axios.get('http://localhost:3000/master-data/providers')
+        axios.get('https://sh-wms-backend.onrender.com/tms/waybill'),
+        axios.get('https://sh-wms-backend.onrender.com/master-data/providers')
       ]);
       setData(waybillsRes.data);
       setProviders(providersRes.data);

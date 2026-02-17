@@ -70,7 +70,7 @@ const AdministrativeUnits = () => {
   
   // Load Tỉnh ngay khi mở Tab
   useEffect(() => {
-    axios.get('http://localhost:3000/master-data/provinces')
+    axios.get('https://sh-wms-backend.onrender.com/master-data/provinces')
       .then(res => setProvinces(res.data))
       .catch(() => message.error('Không tải được danh sách Tỉnh'));
   }, []);
@@ -139,8 +139,8 @@ const GenericCategory = ({
     try {
       // Xử lý URL (nếu có query param sẵn thì dùng dấu &)
       const url = apiEndpoint.includes('?') 
-        ? `http://localhost:3000/master-data/${apiEndpoint}`
-        : `http://localhost:3000/master-data/${apiEndpoint}`;
+        ? `https://sh-wms-backend.onrender.com/master-data/${apiEndpoint}`
+        : `https://sh-wms-backend.onrender.com/master-data/${apiEndpoint}`;
       
       const res = await axios.get(url);
       setData(res.data);
@@ -168,12 +168,12 @@ const GenericCategory = ({
       if (editingId) {
         // Cắt bỏ query param khi gọi update (chỉ lấy phần tên bảng)
         const pureEndpoint = apiEndpoint.split('?')[0];
-        await axios.patch(`http://localhost:3000/master-data/${pureEndpoint}/${editingId}`, values);
+        await axios.patch(`https://sh-wms-backend.onrender.com/master-data/${pureEndpoint}/${editingId}`, values);
         message.success(`Cập nhật thành công!`);
       } else {
         // Cắt bỏ query param khi gọi create
         const pureEndpoint = apiEndpoint.split('?')[0];
-        await axios.post(`http://localhost:3000/master-data/${pureEndpoint}`, payload);
+        await axios.post(`https://sh-wms-backend.onrender.com/master-data/${pureEndpoint}`, payload);
         message.success(`Thêm mới thành công!`);
       }
       setIsModalOpen(false);
@@ -188,7 +188,7 @@ const GenericCategory = ({
     setLoading(true);
     try {
       const pureEndpoint = apiEndpoint.split('?')[0];
-      await axios.delete(`http://localhost:3000/master-data/${pureEndpoint}/${id}`);
+      await axios.delete(`https://sh-wms-backend.onrender.com/master-data/${pureEndpoint}/${id}`);
       message.success('Đã xóa');
       await fetchData();
     } catch (e) { message.error('Lỗi khi xóa'); }
@@ -225,7 +225,7 @@ const GenericCategory = ({
 
           if (mappedItem.code && mappedItem.name) {
              try {
-               await axios.post(`http://localhost:3000/master-data/${pureEndpoint}`, mappedItem);
+               await axios.post(`https://sh-wms-backend.onrender.com/master-data/${pureEndpoint}`, mappedItem);
                count++;
              } catch {}
           }

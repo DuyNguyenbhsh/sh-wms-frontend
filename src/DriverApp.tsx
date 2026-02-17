@@ -44,7 +44,7 @@ const DriverApp = () => {
   const fetchTasks = async (plate: string) => {
     setLoading(true);
     try {
-      const res = await axios.get('http://192.168.2.90:3000/tms/waybill');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/tms/waybill');
       const search = plate.toLowerCase().trim();
       
       const myJobs = res.data.filter((w: any) => {
@@ -70,7 +70,7 @@ const DriverApp = () => {
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await axios.patch(`http://192.168.2.90:3000/tms/waybill/${waybill.id}`, { status: 'DELIVERING' });
+          await axios.patch(`https://sh-wms-backend.onrender.com/tms/waybill/${waybill.id}`, { status: 'DELIVERING' });
           message.success('Đã nhận hàng!');
           fetchTasks(vehiclePlate); 
           setActiveTab('2'); 
@@ -89,7 +89,7 @@ const DriverApp = () => {
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await axios.patch(`http://192.168.2.90:3000/tms/waybill/${waybill.id}`, {
+          await axios.patch(`https://sh-wms-backend.onrender.com/tms/waybill/${waybill.id}`, {
             status: 'DELIVERED',
             codStatus: 'PENDING'
           });

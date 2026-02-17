@@ -15,7 +15,7 @@ const ProductsPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:3000/products');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/products');
       setData(res.data);
     } catch (error) { console.error(error); }
     setLoading(false);
@@ -26,10 +26,10 @@ const ProductsPage = () => {
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
-        await axios.patch(`http://localhost:3000/products/${editingId}`, values);
+        await axios.patch(`https://sh-wms-backend.onrender.com/products/${editingId}`, values);
         message.success('Cập nhật thành công!');
       } else {
-        await axios.post('http://localhost:3000/products', values);
+        await axios.post('https://sh-wms-backend.onrender.com/products', values);
         message.success('Thêm sản phẩm thành công!');
       }
       setIsModalOpen(false);
@@ -40,7 +40,7 @@ const ProductsPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    await axios.delete(`http://localhost:3000/products/${id}`);
+    await axios.delete(`https://sh-wms-backend.onrender.com/products/${id}`);
     message.success('Đã xóa');
     fetchData();
   };

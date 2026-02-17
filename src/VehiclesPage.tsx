@@ -23,7 +23,7 @@ const VehiclesPage = () => {
     setLoading(true);
     try {
       // Giả sử API là /vehicles. Nếu anh đặt tên khác trong Controller thì sửa lại nhé
-      const res = await axios.get('http://localhost:3000/vehicles'); 
+      const res = await axios.get('https://sh-wms-backend.onrender.com/vehicles'); 
       setData(res.data);
     } catch (error) {
       // Nếu chưa có API thật, dùng data giả để test giao diện
@@ -41,10 +41,10 @@ const VehiclesPage = () => {
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
-        await axios.patch(`http://localhost:3000/vehicles/${editingId}`, values);
+        await axios.patch(`https://sh-wms-backend.onrender.com/vehicles/${editingId}`, values);
         message.success('Cập nhật thành công!');
       } else {
-        await axios.post('http://localhost:3000/vehicles', values);
+        await axios.post('https://sh-wms-backend.onrender.com/vehicles', values);
         message.success('Thêm xe mới thành công!');
       }
       setIsModalOpen(false);
@@ -59,7 +59,7 @@ const VehiclesPage = () => {
   // 3. Xử lý Xóa
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:3000/vehicles/${id}`);
+      await axios.delete(`https://sh-wms-backend.onrender.com/vehicles/${id}`);
       message.success('Đã xóa xe');
       fetchData();
     } catch (error) {
@@ -112,7 +112,7 @@ const VehiclesPage = () => {
           // Chỉ thêm nếu có Biển số và Tài xế
           if (mappedItem.plateNumber && mappedItem.driverName) {
             try {
-              await axios.post('http://localhost:3000/vehicles', mappedItem);
+              await axios.post('https://sh-wms-backend.onrender.com/vehicles', mappedItem);
               count++;
             } catch (err) { console.error('Lỗi dòng:', mappedItem); }
           }

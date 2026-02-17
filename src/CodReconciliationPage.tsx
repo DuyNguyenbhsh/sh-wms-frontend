@@ -19,7 +19,7 @@ const CodReconciliationPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:3000/tms/waybill');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/tms/waybill');
       // Lọc các đơn ĐÃ GIAO THÀNH CÔNG (DELIVERED)
       const deliveredOrders = res.data.filter((x: any) => x.status === 'DELIVERED');
       setData(deliveredOrders);
@@ -48,7 +48,7 @@ const CodReconciliationPage = () => {
     try {
       // Lặp qua từng đơn để update (Thực tế nên có API bulk update)
       for (const id of selectedRowKeys) {
-        await axios.patch(`http://localhost:3000/tms/waybill/${id}`, {
+        await axios.patch(`https://sh-wms-backend.onrender.com/tms/waybill/${id}`, {
           codStatus: 'COLLECTED' // Chuyển sang đã thu
         });
       }

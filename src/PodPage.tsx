@@ -25,7 +25,7 @@ const PodPage = () => {
     try {
       // Vì API hiện tại chưa có Search, ta lấy hết về lọc client (Tạm thời)
       // Thực tế sẽ gọi: GET /tms/waybill?code=XXX
-      const res = await axios.get('http://localhost:3000/tms/waybill');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/tms/waybill');
       const found = res.data.find((w: any) => w.waybillCode === keyword.trim());
       
       if (found) {
@@ -45,7 +45,7 @@ const PodPage = () => {
     setLoading(true);
     try {
       // Gọi API Patch mà chúng ta đã xây dựng hôm qua
-      await axios.patch(`http://localhost:3000/tms/waybill/${waybill.id}`, {
+      await axios.patch(`https://sh-wms-backend.onrender.com/tms/waybill/${waybill.id}`, {
         status: status,
         // Có thể thêm field deliveredTime: new Date() nếu Backend hỗ trợ
       });

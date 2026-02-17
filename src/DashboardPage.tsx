@@ -27,9 +27,9 @@ const DashboardPage = () => {
   const fetchDashboardData = async () => {
     try {
       // Gọi API lấy toàn bộ vận đơn để tính toán
-      const res = await axios.get('http://localhost:3000/tms/waybill');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/tms/waybill');
       const data = res.data;
-      const providersRes = await axios.get('http://localhost:3000/master-data/providers');
+      const providersRes = await axios.get('https://sh-wms-backend.onrender.com/master-data/providers');
       const providers = providersRes.data;
 
       // 1. Tính toán số liệu tổng quan (Metric Cards)

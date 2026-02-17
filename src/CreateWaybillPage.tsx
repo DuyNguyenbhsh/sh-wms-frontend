@@ -34,7 +34,7 @@ const CreateWaybillPage = () => {
   const fetchPendingOrders = async () => {
     try {
       // Gọi API TMS để lấy phiếu xuất
-      const res = await axios.get('http://localhost:3000/tms/pending-outbound');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/tms/pending-outbound');
       setOutboundOrders(res.data);
     } catch (error) { console.error(error); }
   };
@@ -42,7 +42,7 @@ const CreateWaybillPage = () => {
   const fetchMasterData = async () => {
     try {
       // Gọi API MasterData để lấy danh sách ĐVVC
-      const res = await axios.get('http://localhost:3000/master-data/providers');
+      const res = await axios.get('https://sh-wms-backend.onrender.com/master-data/providers');
       setProviders(res.data);
     } catch (error) { console.error(error); }
   };
@@ -84,7 +84,7 @@ const CreateWaybillPage = () => {
             // Các trường thông tin khách hàng chỉ để hiển thị, không cần lưu vào bảng Waybill nếu đã có OutboundOrder
         };
 
-        await axios.post('http://localhost:3000/tms/waybill', payload);
+        await axios.post('https://sh-wms-backend.onrender.com/tms/waybill', payload);
         
         message.success(`Tạo vận đơn thành công cho phiếu ${currentOrder.code}`);
         setIsModalOpen(false);

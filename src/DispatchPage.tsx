@@ -26,13 +26,13 @@ const DispatchPage = () => {
     try {
       // 1. Lấy đơn hàng đang chờ (Status = NEW hoặc READY_TO_PICK)
       // Thực tế sẽ gọi API: GET /tms/waybill?status=READY_TO_PICK
-      const resWaybills = await axios.get('http://localhost:3000/tms/waybill');
+      const resWaybills = await axios.get('https://sh-wms-backend.onrender.com/tms/waybill');
       // Lọc tạm ở Client (sau này lọc ở Backend)
       const pending = resWaybills.data.filter((w: any) => w.status === 'NEW' || w.status === 'READY_TO_PICK');
       setPendingWaybills(pending);
 
       // 2. Lấy danh sách xe rảnh (Status = ACTIVE)
-      const resVehicles = await axios.get('http://localhost:3000/vehicles');
+      const resVehicles = await axios.get('https://sh-wms-backend.onrender.com/vehicles');
       setVehicles(resVehicles.data.filter((v: any) => v.status === 'ACTIVE'));
     } catch (error) {
       console.error(error);
@@ -62,7 +62,7 @@ const DispatchPage = () => {
       for (const id of selectedWaybillIds) {
         // Tìm thông tin xe
         const vehicle = vehicles.find(v => v.id === selectedVehicle);
-        await axios.patch(`http://localhost:3000/tms/waybill/${id}`, { // API này cần anh viết thêm bên Backend sau nhé
+        await axios.patch(`https://sh-wms-backend.onrender.com/tms/waybill/${id}`, { // API này cần anh viết thêm bên Backend sau nhé
            status: 'DELIVERING', // Chuyển trạng thái sang Đang giao
            vehicleId: selectedVehicle,
            driverName: vehicle?.driverName,
